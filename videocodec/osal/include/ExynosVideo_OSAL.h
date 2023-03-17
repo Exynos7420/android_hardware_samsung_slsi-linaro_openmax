@@ -30,15 +30,15 @@
 
 #include "exynos_v4l2.h"
 
-#include "videodev2_exynos_media.h"
+#include <linux/videodev2_exynos_media.h>
 #ifdef USE_EXYNOS_MEDIA_EXT
-#include "videodev2_exynos_media_ext.h"
+#include <linux/videodev2_exynos_media_ext.h>
 #endif
-#ifdef USE_MFC_HEADER
-#include "exynos_mfc_media.h"
+#ifdef USE_MFC_MEDIA
+#include <linux/exynos_mfc_media.h>
 #endif
 
-#include <hardware/exynos/ion.h>
+#include "ion.h"
 
 #include <log/log.h>
 
