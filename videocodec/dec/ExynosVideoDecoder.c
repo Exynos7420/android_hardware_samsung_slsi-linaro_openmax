@@ -272,7 +272,7 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
     pCtx->videoCtx.pOutMutex = (void*)pMutex;
 
     /* for shared memory : referenced DPB handling */
-    hIonClient = (long)exynos_ion_open();
+    hIonClient = (long)ion_open();
 #ifdef USE_ANDROID
     if (hIonClient < 0) {
 #else
@@ -286,10 +286,10 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
 
     /* for DPB ref. count */
     if (pCtx->videoCtx.instInfo.supportInfo.dec.bDrvDPBManageSupport != VIDEO_TRUE) {
-        fd = exynos_ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(PrivateDataShareBuffer) * VIDEO_BUFFER_MAX_NUM,
-                            EXYNOS_ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(PrivateDataShareBuffer) * VIDEO_BUFFER_MAX_NUM,
+                            ion_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
         if (fd < 0) {
-            ALOGE("%s: Failed to exynos_ion_alloc() for nPrivateDataShareFD", __FUNCTION__);
+            ALOGE("%s: Failed to ion_alloc() for nPrivateDataShareFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.dec.nPrivateDataShareFD = 0;
             goto EXIT_QUERYCAP_FAIL;
         }
@@ -311,10 +311,10 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
 
     /* for HDR Dynamic Info */
     if (pCtx->videoCtx.instInfo.supportInfo.dec.bHDRDynamicInfoSupport == VIDEO_TRUE) {
-        fd = exynos_ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM,
-                              EXYNOS_ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM,
+                              ion_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
         if (fd < 0) {
-            ALOGE("[%s] Failed to exynos_ion_alloc() for pHDRInfoShareBufferFD", __FUNCTION__);
+            ALOGE("[%s] Failed to ion_alloc() for pHDRInfoShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.dec.nHDRInfoShareBufferFD = 0;
             goto EXIT_QUERYCAP_FAIL;
         }
@@ -338,8 +338,9 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
             ALOGE("[%s] Failed to Codec_OSAL_SetControl(CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE)", __FUNCTION__);
             goto EXIT_QUERYCAP_FAIL;
         }
-    }
 #endif
+    }
+
     return (void *)pCtx;
 
 EXIT_QUERYCAP_FAIL:
@@ -383,7 +384,7 @@ EXIT_QUERYCAP_FAIL:
 
     /* free a ion_client */
     if (pCtx->videoCtx.hIONHandle > 0) {
-        exynos_ion_close(pCtx->videoCtx.hIONHandle);
+        ion_close(pCtx->videoCtx.hIONHandle);
         pCtx->videoCtx.hIONHandle = 0;
     }
 
@@ -443,7 +444,7 @@ static ExynosVideoErrorType MFC_Decoder_Finalize(void *pHandle)
 
     /* free a ion_client */
     if (pCtx->videoCtx.hIONHandle > 0) {
-        exynos_ion_close(pCtx->videoCtx.hIONHandle);
+        ion_close(pCtx->videoCtx.hIONHandle);
         pCtx->videoCtx.hIONHandle = 0;
     }
 

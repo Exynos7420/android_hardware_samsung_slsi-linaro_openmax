@@ -39,7 +39,8 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#include <hardware/exynos/ion.h>
+#include <ion/ion.h>
+#include "ION.h"
 
 #include "Exynos_OSAL_Mutex.h"
 #include "Exynos_OSAL_Memory.h"
@@ -82,7 +83,7 @@ OMX_HANDLETYPE Exynos_OSAL_SharedMemory_Open()
         goto EXIT;
     Exynos_OSAL_Memset(pHandle, 0, sizeof(EXYNOS_SHARED_MEMORY));
 
-    IONClient = (long)exynos_ion_open();
+    IONClient = (long)ion_open();
     if (IONClient < 0) {
         Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "ion_open is failed: %d", IONClient);
         Exynos_OSAL_Free((void *)pHandle);
@@ -95,7 +96,7 @@ OMX_HANDLETYPE Exynos_OSAL_SharedMemory_Open()
     if (OMX_ErrorNone != Exynos_OSAL_MutexCreate(&pHandle->hSMMutex)) {
         Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to Exynos_OSAL_MutexCreate", __FUNCTION__);
         /* free a ion_client */
-        exynos_ion_close(pHandle->hIONHandle);
+        ion_close(pHandle->hIONHandle);
         pHandle->hIONHandle = 0;
 
         Exynos_OSAL_Free((void *)pHandle);
@@ -151,7 +152,7 @@ void Exynos_OSAL_SharedMemory_Close(OMX_HANDLETYPE handle)
     pHandle->hSMMutex = NULL;
 
     /* free a ion_client */
-    exynos_ion_close(pHandle->hIONHandle);
+    ion_close(pHandle->hIONHandle);
     pHandle->hIONHandle = 0;
 
     Exynos_OSAL_Free(pHandle);
@@ -186,35 +187,35 @@ OMX_PTR Exynos_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, MEMO
     case (EXT_MEMORY | SECURE_MEMORY | CONTIG_MEMORY):
     case (EXT_MEMORY | SECURE_MEMORY | CACHED_MEMORY):
     case (EXT_MEMORY | SECURE_MEMORY):
-        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
+        mask = ION_HEAP_VIDEO_STREAM_MASK;
         flag = ION_FLAG_PROTECTED;
         break;
     case (EXT_MEMORY | CONTIG_MEMORY | CACHED_MEMORY):
     case (EXT_MEMORY | CONTIG_MEMORY):
     case (EXT_MEMORY | CACHED_MEMORY):
     case EXT_MEMORY:
-        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
+        mask = ION_HEAP_VIDEO_STREAM_MASK;
         flag = 0;
         break;
     case (SECURE_MEMORY | CONTIG_MEMORY | CACHED_MEMORY):  /* SECURE */
     case (SECURE_MEMORY | CONTIG_MEMORY):
     case (SECURE_MEMORY | CACHED_MEMORY):
     case SECURE_MEMORY:
-        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
+        mask = ION_HEAP_VIDEO_STREAM_MASK;
         flag = ION_FLAG_PROTECTED;
         break;
     case (CONTIG_MEMORY | CACHED_MEMORY):  /* CONTIG */
     case CONTIG_MEMORY:
-        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
+        mask = ION_HEAP_VIDEO_STREAM_MASK;
         flag = 0;
         break;
     case CACHED_MEMORY:  /* CACHED */
-        mask = EXYNOS_ION_HEAP_SYSTEM_MASK;
+        mask = ION_HEAP_SYSTEM_MASK;
         flag = ION_FLAG_CACHED | ION_FLAG_CACHED_NEEDS_SYNC;
         break;
     default:  /* NORMAL */
 	// NOTE: cached?
-        mask = EXYNOS_ION_HEAP_SYSTEM_MASK;
+        mask = ION_HEAP_SYSTEM_MASK;
         flag = ION_FLAG_CACHED | ION_FLAG_CACHED_NEEDS_SYNC;
         break;
     }
@@ -222,13 +223,13 @@ OMX_PTR Exynos_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, MEMO
     if (flag & ION_FLAG_CACHED)  /* use improved cache oprs */
         flag |= ION_FLAG_CACHED_NEEDS_SYNC;
 
-    if ((IONBuffer = exynos_ion_alloc(pHandle->hIONHandle, size, mask, flag)) < 0) {
-        Exynos_OSAL_Log(EXYNOS_LOG_WARNING, "[%s] Failed to exynos_ion_alloc(mask:%x, flag:%x)", __FUNCTION__, mask, flag);
+    if ((IONBuffer = ion_alloc(pHandle->hIONHandle, size, mask, flag)) < 0) {
+        Exynos_OSAL_Log(EXYNOS_LOG_WARNING, "[%s] Failed to ion_alloc(mask:%x, flag:%x)", __FUNCTION__, mask, flag);
         if (memoryType == CONTIG_MEMORY) {
             /* retry at normal area */
             flag = 0;
-            if ((IONBuffer = exynos_ion_alloc(pHandle->hIONHandle, size, mask, flag)) < 0) {
-                Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] retry: Failed to exynos_ion_alloc(mask:%x, flag:%x)", __FUNCTION__, mask, flag);
+            if ((IONBuffer = ion_alloc(pHandle->hIONHandle, size, mask, flag)) < 0) {
+                Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] retry: Failed to ion_alloc(mask:%x, flag:%x)", __FUNCTION__, mask, flag);
                 IONBuffer = 0;
             }
         }
@@ -248,7 +249,7 @@ OMX_PTR Exynos_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, MEMO
         if (pBuffer == MAP_FAILED) {
             Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to Exynos_OSAL_Mmap(size:%d)", __FUNCTION__, size);
             /* free a ion_buffer */
-            close(IONBuffer); // NOTE: argument to exynos_ion_close/ion_close() should be allocated by ion_open/exynos_ion_open
+            close(IONBuffer); // NOTE: argument to ion_close() should be allocated by ion_open
             Exynos_OSAL_Free((OMX_PTR)pElement);
             pBuffer = NULL;
             goto EXIT;

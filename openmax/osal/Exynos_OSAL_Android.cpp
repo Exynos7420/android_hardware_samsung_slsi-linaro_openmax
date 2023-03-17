@@ -1211,13 +1211,13 @@ OMX_ERRORTYPE Exynos_OSAL_RefCount_Reset(OMX_HANDLETYPE hREF)
         if (phREF->SharedBuffer[i].bufferFd > 0) {
             while (phREF->SharedBuffer[i].cnt > 0) {
                 if (phREF->SharedBuffer[i].ionHandle != -1)
-                    exynos_ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle);
+                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle);
 
                 if (phREF->SharedBuffer[i].ionHandle1 != -1)
-                    exynos_ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle1);
+                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle1);
 
                 if (phREF->SharedBuffer[i].ionHandle2 != -1)
-                    exynos_ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle2);
+                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle2);
 
                 phREF->SharedBuffer[i].cnt--;
 
@@ -1401,24 +1401,24 @@ OMX_ERRORTYPE Exynos_OSAL_RefCount_Increase(
 #else
     if ((priv_hnd->fd > 0) &&
         (nPlaneCnt >= 1)) {
-        if (exynos_ion_import_handle(getIonFd(module), priv_hnd->fd, &ionHandle) < 0) {
-            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to exynos_ion_import_handle(client:%d, fd:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd);
+        if (ion_import_handle(getIonFd(module), priv_hnd->fd, &ionHandle) < 0) {
+            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import_handle(client:%d, fd:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd);
             ionHandle = -1;
         }
     }
 
     if ((priv_hnd->fd1 > 0) &&
         (nPlaneCnt >= 2)) {
-        if (exynos_ion_import_handle(getIonFd(module), priv_hnd->fd1, &ionHandle1) < 0) {
-            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to exynos_ion_import_handle(client:%d, fd1:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd1);
+        if (ion_import_handle(getIonFd(module), priv_hnd->fd1, &ionHandle1) < 0) {
+            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import_handle(client:%d, fd1:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd1);
             ionHandle1 = -1;
         }
     }
 
     if ((priv_hnd->fd2 > 0) &&
         (nPlaneCnt == 3)) {
-        if (exynos_ion_import_handle(getIonFd(module), priv_hnd->fd2, &ionHandle2) < 0) {
-            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to exynos_ion_import_handle(client:%d, fd2:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd2);
+        if (ion_import_handle(getIonFd(module), priv_hnd->fd2, &ionHandle2) < 0) {
+            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import_handle(client:%d, fd2:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd2);
             ionHandle2 = -1;
         }
     }
@@ -1567,13 +1567,13 @@ OMX_ERRORTYPE Exynos_OSAL_RefCount_Decrease(
         for (j = 0; j < MAX_BUFFER_REF; j++) {
             if (phREF->SharedBuffer[j].bufferFd == (unsigned long long)dpbFD[i].fd) {
                 if (phREF->SharedBuffer[j].ionHandle != -1)
-                    exynos_ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle);
+                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle);
 
                 if (phREF->SharedBuffer[j].ionHandle1 != -1)
-                    exynos_ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle1);
+                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle1);
 
                 if (phREF->SharedBuffer[j].ionHandle2 != -1)
-                    exynos_ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle2);
+                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle2);
 
                 phREF->SharedBuffer[j].cnt--;
 

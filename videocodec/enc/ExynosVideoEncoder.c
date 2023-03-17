@@ -303,7 +303,7 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
     pCtx->videoCtx.pOutMutex = (void*)pMutex;
 
     /* for shared memory : temporal svc info, ROI info */
-    hIonClient = (long)exynos_ion_open();
+    hIonClient = (long)ion_open();
 #ifdef USE_ANDROID
     if (hIonClient < 0) {
 #else
@@ -316,10 +316,10 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
     pCtx->videoCtx.hIONHandle = (unsigned long)hIonClient;
 
     if (pCtx->videoCtx.instInfo.supportInfo.enc.bTemporalSvcSupport == VIDEO_TRUE) {
-        fd = exynos_ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(TemporalLayerShareBuffer),
-                              EXYNOS_ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(TemporalLayerShareBuffer),
+                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
         if (fd < 0) {
-            ALOGE("%s: Failed to exynos_ion_alloc() for nTemporalLayerShareBufferFD", __FUNCTION__);
+            ALOGE("%s: Failed to ion_alloc() for nTemporalLayerShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.enc.nTemporalLayerShareBufferFD = 0;
             goto EXIT_QUERYCAP_FAIL;
         }
@@ -335,10 +335,10 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
     }
 
     if (pCtx->videoCtx.instInfo.supportInfo.enc.bRoiInfoSupport == VIDEO_TRUE) {
-        fd = exynos_ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(RoiInfoShareBuffer),
-                              EXYNOS_ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(RoiInfoShareBuffer),
+                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
         if (fd < 0) {
-            ALOGE("%s: Failed to exynos_ion_alloc() for nRoiShareBufferFD", __FUNCTION__);
+            ALOGE("%s: Failed to ion_alloc() for nRoiShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.enc.nRoiShareBufferFD = 0;
             goto EXIT_QUERYCAP_FAIL;
         }
@@ -355,10 +355,10 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
 
     /* for HDR Dynamic Info */
     if (pCtx->videoCtx.instInfo.supportInfo.enc.bHDRDynamicInfoSupport == VIDEO_TRUE) {
-        fd = exynos_ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM,
-                              EXYNOS_ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM,
+                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
         if (fd < 0) {
-            ALOGE("%s: Failed to exynos_ion_alloc() for nHDRInfoShareBufferFD", __FUNCTION__);
+            ALOGE("%s: Failed to ion_alloc() for nHDRInfoShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.enc.nHDRInfoShareBufferFD = 0;
             goto EXIT_QUERYCAP_FAIL;
         }
@@ -439,7 +439,7 @@ EXIT_QUERYCAP_FAIL:
 
     /* free a ion_client */
     if (pCtx->videoCtx.hIONHandle > 0) {
-        exynos_ion_close(pCtx->videoCtx.hIONHandle);
+        ion_close(pCtx->videoCtx.hIONHandle);
         pCtx->videoCtx.hIONHandle = 0;
     }
 
@@ -511,7 +511,7 @@ static ExynosVideoErrorType MFC_Encoder_Finalize(void *pHandle)
 
     /* free a ion_client */
     if (pCtx->videoCtx.hIONHandle > 0) {
-        exynos_ion_close(pCtx->videoCtx.hIONHandle);
+        ion_close(pCtx->videoCtx.hIONHandle);
         pCtx->videoCtx.hIONHandle = 0;
     }
 
