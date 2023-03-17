@@ -67,7 +67,7 @@ LOCAL_C_INCLUDES := \
 	$(EXYNOS_OMX_COMPONENT)/common \
 	$(EXYNOS_OMX_COMPONENT)/video/dec \
 	$(EXYNOS_VIDEO_CODEC)/include \
-	$(TOP)/hardware/samsung_slsi-linaro/exynos/include \
+	$(TOP)/hardware/samsung_slsi/exynos/include \
 
 ifeq ($(BOARD_USE_SKYPE_HD), true)
 LOCAL_CFLAGS += -DUSE_SKYPE_HD

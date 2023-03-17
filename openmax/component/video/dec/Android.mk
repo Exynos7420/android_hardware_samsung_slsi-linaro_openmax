@@ -19,7 +19,7 @@ LOCAL_C_INCLUDES := \
 	$(EXYNOS_OMX_COMPONENT)/common \
 	$(EXYNOS_OMX_COMPONENT)/video/dec \
 	$(EXYNOS_VIDEO_CODEC)/include \
-	$(TOP)/hardware/samsung_slsi-linaro/exynos/include \
+	$(TOP)/hardware/samsung_slsi/exynos/include \
 
 LOCAL_STATIC_LIBRARIES := libExynosVideoApi libExynosOMX_OSAL
 LOCAL_SHARED_LIBRARIES := liblog

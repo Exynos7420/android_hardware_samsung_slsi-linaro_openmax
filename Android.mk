@@ -1,4 +1,4 @@
-ifeq ($(TARGET_SLSI_VARIANT),linaro)
+ifeq ($(TARGET_SLSI_VARIANT),bsp)
 ifneq ($(filter exynos, $(TARGET_SOC_NAME)),)
 openmax_dirs := \
 	videocodec \
