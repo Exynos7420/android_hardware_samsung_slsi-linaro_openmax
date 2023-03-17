@@ -1137,7 +1137,7 @@ EXIT:
 
     return ret;
 }
-
+#ifdef USE_HDR
 void Mpeg4CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 {
     EXYNOS_OMX_BASECOMPONENT      *pExynosComponent = (EXYNOS_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
@@ -1180,6 +1180,7 @@ void Mpeg4CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 
     return ;
 }
+#endif
 
 OMX_ERRORTYPE Mpeg4CodecUpdateResolution(OMX_COMPONENTTYPE *pOMXComponent)
 {
@@ -1338,7 +1339,7 @@ OMX_ERRORTYPE Mpeg4CodecSrcSetup(
     }
     Print_Mpeg4Enc_Param(pEncParam);
 
-#ifdef USE_ANDROID
+#ifdef USE_HDR
     Mpeg4CodecSetHdrInfo(pOMXComponent);
 #endif
 

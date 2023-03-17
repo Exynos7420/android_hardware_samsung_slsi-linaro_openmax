@@ -1025,7 +1025,7 @@ EXIT:
     return ret;
 }
 
-
+#ifdef USE_HDR
 void VP8CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 {
     EXYNOS_OMX_BASECOMPONENT      *pExynosComponent = (EXYNOS_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
@@ -1068,6 +1068,7 @@ void VP8CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 
     return ;
 }
+#endif
 
 OMX_ERRORTYPE Vp8CodecUpdateResolution(OMX_COMPONENTTYPE *pOMXComponent)
 {
@@ -1223,7 +1224,7 @@ OMX_ERRORTYPE VP8CodecSrcSetup(
     }
     Print_VP8Enc_Param(pEncParam);
 
-#ifdef USE_ANDROID
+#ifdef USE_HDR
     VP8CodecSetHdrInfo(pOMXComponent);
 #endif
 

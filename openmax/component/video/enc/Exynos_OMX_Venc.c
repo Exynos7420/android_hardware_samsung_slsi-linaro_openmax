@@ -938,9 +938,11 @@ OMX_BOOL Exynos_CSC_InputData(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX_DATA 
             case BLUR_RESOL_720:
                 filterType = CSC_FT_720;
                 break;
+#ifdef CSC_FT_960
             case BLUR_RESOL_960:
                 filterType = CSC_FT_960;
                 break;
+#endif
             case BLUR_RESOL_1080:
                 filterType = CSC_FT_1080;
                 break;

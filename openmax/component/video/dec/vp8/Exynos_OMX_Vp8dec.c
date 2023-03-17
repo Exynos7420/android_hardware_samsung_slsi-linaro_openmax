@@ -3083,9 +3083,9 @@ OSCL_EXPORT_REF OMX_ERRORTYPE Exynos_OMX_ComponentInit(
 
     pVideoDec->exynos_codec_checkFormatSupport      = &CheckFormatHWSupport;
     pVideoDec->exynos_codec_checkResolutionChange   = &Vp8CodecCheckResolution;
-
+#ifdef USE_EXTRA_INFO
     pVideoDec->exynos_codec_updateExtraInfo = NULL;
-
+#endif
     pVideoDec->hSharedMemory = Exynos_OSAL_SharedMemory_Open();
     if (pVideoDec->hSharedMemory == NULL) {
         Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%p][%s] Failed to SharedMemory_Open", pExynosComponent, __FUNCTION__);

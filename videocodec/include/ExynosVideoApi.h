@@ -734,7 +734,9 @@ typedef struct _ExynosVideoDecOps {
     ExynosVideoErrorType  (*Enable_DualDPBMode)(void *pHandle);
     ExynosVideoErrorType  (*Enable_DynamicDPB)(void *pHandle);
     ExynosVideoErrorType  (*Enable_DiscardRcvHeader)(void *pHandle);
+#ifdef USE_HDR
     ExynosVideoErrorType  (*Get_HDRInfo)(void *pHandle, ExynosVideoHdrInfo *pHdrInfo);
+#endif
     ExynosVideoErrorType  (*Set_SearchBlackBar)(void *pHandle, ExynosVideoBoolType bUse);
     int                   (*Get_ActualFormat)(void *pHandle);
 } ExynosVideoDecOps;

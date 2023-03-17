@@ -14,7 +14,7 @@ LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/osal/include \
 	$(TOP)/hardware/samsung_slsi/exynos/include
 
-LOCAL_SHARED_LIBRARIES := libion_exynos
+LOCAL_SHARED_LIBRARIES := libion
 
 LOCAL_SHARED_LIBRARIES += liblog
 
@@ -40,6 +40,7 @@ endif
 # since 3.10 kernel
 ifneq ($(filter-out 3.4, $(TARGET_LINUX_KERNEL_VERSION)),)
 LOCAL_CFLAGS += -DUSE_DEFINE_H264_SEI_TYPE
+LOCAL_CFLAGS += -DUSE_ORIGINAL_HEADER
 endif
 
 # since 3.18 kernel

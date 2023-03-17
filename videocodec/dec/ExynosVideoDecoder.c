@@ -286,8 +286,8 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
 
     /* for DPB ref. count */
     if (pCtx->videoCtx.instInfo.supportInfo.dec.bDrvDPBManageSupport != VIDEO_TRUE) {
-        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(PrivateDataShareBuffer) * VIDEO_BUFFER_MAX_NUM,
-                            ion_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc_fd(pCtx->videoCtx.hIONHandle, sizeof(PrivateDataShareBuffer) * VIDEO_BUFFER_MAX_NUM,
+                     0, ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED, &(pCtx->videoCtx.specificInfo.dec.nPrivateDataShareFD));
         if (fd < 0) {
             ALOGE("%s: Failed to ion_alloc() for nPrivateDataShareFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.dec.nPrivateDataShareFD = 0;
@@ -309,10 +309,11 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
                 0, sizeof(PrivateDataShareBuffer) * VIDEO_BUFFER_MAX_NUM);
     }
 
+#ifdef USE_HDR
     /* for HDR Dynamic Info */
     if (pCtx->videoCtx.instInfo.supportInfo.dec.bHDRDynamicInfoSupport == VIDEO_TRUE) {
-        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM,
-                              ion_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc_fd(pCtx->videoCtx.hIONHandle, sizeof(PrivateDataShareBuffer) * VIDEO_BUFFER_MAX_NUM,
+                     0, ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED, &(pCtx->pHDRInfoShareBufferFD));
         if (fd < 0) {
             ALOGE("[%s] Failed to ion_alloc() for pHDRInfoShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.dec.nHDRInfoShareBufferFD = 0;
@@ -340,7 +341,7 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
         }
 #endif
     }
-
+#endif
     return (void *)pCtx;
 
 EXIT_QUERYCAP_FAIL:
@@ -897,6 +898,7 @@ EXIT:
     return ret;
 }
 
+#ifdef USE_HDR
 /*
  * [Decoder OPS] Get HDR Info
  */
@@ -912,6 +914,7 @@ static ExynosVideoErrorType MFC_Decoder_Get_HDRInfo(void *pHandle, ExynosVideoHd
         goto EXIT;
     }
 
+#ifdef CODEC_OSAL_CID_DEC_HDR_INFO
     /* get Color Aspects and HDR Static Info
      * in case of HDR Dynamic Info is already updated at dqbuf */
     if (pCtx->videoCtx.outbufGeometry.HdrInfo.eChangedType & ~HDR_INFO_DYNAMIC_META) {
@@ -921,12 +924,14 @@ static ExynosVideoErrorType MFC_Decoder_Get_HDRInfo(void *pHandle, ExynosVideoHd
             goto EXIT;
         }
     }
+#endif
 
     memcpy(pHdrInfo, &(pCtx->videoCtx.outbufGeometry.HdrInfo), sizeof(ExynosVideoHdrInfo));
 
 EXIT:
     return ret;
 }
+#endif
 
 /*
  * [Decoder OPS] Set Search Black Bar
@@ -3144,7 +3149,9 @@ static ExynosVideoDecOps defDecOps = {
     .Enable_DiscardRcvHeader    = MFC_Decoder_Enable_DiscardRcvHeader,
     .Enable_DualDPBMode         = MFC_Decoder_Enable_DualDPBMode,
     .Enable_DynamicDPB          = MFC_Decoder_Enable_DynamicDPB,
+#ifdef USE_HDR
     .Get_HDRInfo                = MFC_Decoder_Get_HDRInfo,
+#endif
     .Set_SearchBlackBar         = MFC_Decoder_Set_SearchBlackBar,
     .Get_ActualFormat           = MFC_Decoder_Get_ActualFormat,
 };

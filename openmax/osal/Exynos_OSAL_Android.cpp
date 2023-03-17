@@ -41,6 +41,9 @@
 #include <android/hardware/graphics/mapper/2.0/IMapper.h>
 #include <android/hardware/power/1.0/IPower.h>
 
+#include <ion/ion.h>
+#include "exynos_ion.h"
+
 #include "csc.h"
 
 #ifdef GRALLOC_VERSION1
@@ -74,7 +77,8 @@ typedef gralloc_module_t GRALLOC_MODULE;
 #define OMX_GRALLOC_USAGE_PROTECTED (GRALLOC_USAGE_PROTECTED)
 #endif
 
-#include <hardware/exynos/ion.h>
+#include <ion/ion.h>
+#include "exynos_ion.h"
 
 #include "Exynos_OSAL_Mutex.h"
 #include "Exynos_OSAL_Semaphore.h"
@@ -318,7 +322,9 @@ static OMX_ERRORTYPE getColorAspectsFromDataSpace(OMX_PTR param)
         break;
     case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SP_M_S10B:
     case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_420_SPN_S10B:
+#ifdef HAL_PIXEL_FORMAT_EXYNOS_YCbCr_P010_M
     case HAL_PIXEL_FORMAT_EXYNOS_YCbCr_P010_M:      /* P010 */
+#endif
         /* W/A for MCD : lower limitation of 10bit is HDR(BT.2020) */
         if ((dataspace & HAL_DATASPACE_STANDARD_BT2020) != HAL_DATASPACE_STANDARD_BT2020) {
             unsigned int mask = 0xFFFFFFFF ^ (0b111111 << HAL_DATASPACE_STANDARD_SHIFT);
@@ -815,11 +821,13 @@ void Exynos_OSAL_ColorSpaceToColorAspects(
         colorAspects->nTransferType = ColorAspects::TransferSMPTE170M;
         colorAspects->nCoeffType    = ColorAspects::MatrixBT709_5;
         break;
+#ifdef CSC_EQ_COLORSPACE_BT2020
     case CSC_EQ_COLORSPACE_BT2020:
         colorAspects->nPrimaryType  = ColorAspects::PrimariesBT2020;
         colorAspects->nTransferType = ColorAspects::TransferSMPTE170M;
         colorAspects->nCoeffType    = ColorAspects::MatrixBT2020;
         break;
+#endif
     case CSC_EQ_COLORSPACE_SMPTE170M:
     default:
         colorAspects->nPrimaryType  = ColorAspects::PrimariesBT601_6_625;
@@ -1211,13 +1219,13 @@ OMX_ERRORTYPE Exynos_OSAL_RefCount_Reset(OMX_HANDLETYPE hREF)
         if (phREF->SharedBuffer[i].bufferFd > 0) {
             while (phREF->SharedBuffer[i].cnt > 0) {
                 if (phREF->SharedBuffer[i].ionHandle != -1)
-                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle);
+                    ion_free(getIonFd(module), phREF->SharedBuffer[i].ionHandle);
 
                 if (phREF->SharedBuffer[i].ionHandle1 != -1)
-                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle1);
+                    ion_free(getIonFd(module), phREF->SharedBuffer[i].ionHandle1);
 
                 if (phREF->SharedBuffer[i].ionHandle2 != -1)
-                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[i].ionHandle2);
+                    ion_free(getIonFd(module), phREF->SharedBuffer[i].ionHandle2);
 
                 phREF->SharedBuffer[i].cnt--;
 
@@ -1401,24 +1409,24 @@ OMX_ERRORTYPE Exynos_OSAL_RefCount_Increase(
 #else
     if ((priv_hnd->fd > 0) &&
         (nPlaneCnt >= 1)) {
-        if (ion_import_handle(getIonFd(module), priv_hnd->fd, &ionHandle) < 0) {
-            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import_handle(client:%d, fd:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd);
+        if (ion_import(getIonFd(module), priv_hnd->fd, &ionHandle) < 0) {
+            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import(client:%d, fd:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd);
             ionHandle = -1;
         }
     }
 
     if ((priv_hnd->fd1 > 0) &&
         (nPlaneCnt >= 2)) {
-        if (ion_import_handle(getIonFd(module), priv_hnd->fd1, &ionHandle1) < 0) {
-            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import_handle(client:%d, fd1:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd1);
+        if (ion_import(getIonFd(module), priv_hnd->fd1, &ionHandle1) < 0) {
+            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import(client:%d, fd1:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd1);
             ionHandle1 = -1;
         }
     }
 
     if ((priv_hnd->fd2 > 0) &&
         (nPlaneCnt == 3)) {
-        if (ion_import_handle(getIonFd(module), priv_hnd->fd2, &ionHandle2) < 0) {
-            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import_handle(client:%d, fd2:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd2);
+        if (ion_import(getIonFd(module), priv_hnd->fd2, &ionHandle2) < 0) {
+            Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] Failed to ion_import(client:%d, fd2:%d)", __FUNCTION__, getIonFd(module), priv_hnd->fd2);
             ionHandle2 = -1;
         }
     }
@@ -1567,13 +1575,13 @@ OMX_ERRORTYPE Exynos_OSAL_RefCount_Decrease(
         for (j = 0; j < MAX_BUFFER_REF; j++) {
             if (phREF->SharedBuffer[j].bufferFd == (unsigned long long)dpbFD[i].fd) {
                 if (phREF->SharedBuffer[j].ionHandle != -1)
-                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle);
+                    ion_free(getIonFd(module), phREF->SharedBuffer[j].ionHandle);
 
                 if (phREF->SharedBuffer[j].ionHandle1 != -1)
-                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle1);
+                    ion_free(getIonFd(module), phREF->SharedBuffer[j].ionHandle1);
 
                 if (phREF->SharedBuffer[j].ionHandle2 != -1)
-                    ion_free_handle(getIonFd(module), phREF->SharedBuffer[j].ionHandle2);
+                    ion_free(getIonFd(module), phREF->SharedBuffer[j].ionHandle2);
 
                 phREF->SharedBuffer[j].cnt--;
 

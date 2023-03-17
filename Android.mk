@@ -13,4 +13,8 @@ openmax_dirs := \
 
 include $(call all-named-subdir-makefiles,$(openmax_dirs))
 endif
+
+ifeq ($(BOARD_OMX_USES_HDR),true)
+	LOCAL_CFLAGS += -DUSE_HDR
+endif
 endif

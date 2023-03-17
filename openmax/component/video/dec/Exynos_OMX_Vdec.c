@@ -781,7 +781,7 @@ OMX_BOOL Exynos_CSC_OutputData(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX_DATA
             }
 
             dstImgInfo.nStride = stride;
-
+#ifdef USE_EXTRA_INFO
             /* update extra information to vendor path for renderer */
             {
                 ExynosVideoMeta *pMeta = (ExynosVideoMeta *)bufferInfo.addr[2];
@@ -789,6 +789,7 @@ OMX_BOOL Exynos_CSC_OutputData(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX_DATA
                 if (pVideoDec->exynos_codec_updateExtraInfo != NULL)
                     pVideoDec->exynos_codec_updateExtraInfo(pOMXComponent, pMeta);
             }
+#endif
 
             if (csc_method == CSC_METHOD_HW) {
                 pDstBuf[0]  = (void *)bufferInfo.fd[0];

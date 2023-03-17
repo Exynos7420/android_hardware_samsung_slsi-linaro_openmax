@@ -43,7 +43,9 @@
 
 #include "Exynos_OSAL_Platform.h"
 
+#ifdef USE_EXTRA_INFO
 #include "VendorVideoAPI.h"
+#endif
 
 #ifdef USE_SKYPE_HD
 #include "Exynos_OSAL_SkypeHD.h"
@@ -1292,7 +1294,7 @@ EXIT:
 
     return ret;
 }
-
+#ifdef USE_HDR
 void H264CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 {
     EXYNOS_OMX_BASECOMPONENT      *pExynosComponent = (EXYNOS_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
@@ -1335,7 +1337,7 @@ void H264CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 
     return ;
 }
-
+#endif
 OMX_ERRORTYPE H264CodecUpdateResolution(OMX_COMPONENTTYPE *pOMXComponent)
 {
     OMX_ERRORTYPE                  ret                = OMX_ErrorNone;
@@ -1497,7 +1499,7 @@ OMX_ERRORTYPE H264CodecSrcSetup(
         else
             Exynos_OSAL_Log(EXYNOS_LOG_WARNING, "[%p][%s] Not supported control: Enable_PrependSpsPpsToIdr", pExynosComponent, __FUNCTION__);
     }
-
+#ifdef USE_EXTRA_INFO
     if ((pInputPort->eMetaDataType == METADATA_TYPE_GRAPHIC) &&
         ((pInputPort->bufferProcessType & BUFFER_SHARE) &&
          (pSrcInputData->buffer.addr[2] != NULL))) {
@@ -1508,7 +1510,7 @@ OMX_ERRORTYPE H264CodecSrcSetup(
                 pMFCH264Handle->bWeightedPrediction = OMX_TRUE;
         }
     }
-
+#endif
     if (pH264Enc->hMFCH264Handle.videoInstInfo.supportInfo.enc.bAdaptiveLayerBitrateSupport == VIDEO_TRUE) {
         if (pH264Enc->bUseTemporalLayerBitrateRatio == OMX_TRUE) {
             pEncOps->Enable_AdaptiveLayerBitrate(pMFCH264Handle->hMFCHandle, 0); /* Disable : Use layer bitrate from framework */
@@ -1517,7 +1519,7 @@ OMX_ERRORTYPE H264CodecSrcSetup(
         }
     }
 
-#ifdef USE_ANDROID
+#ifdef USE_HDR
     H264CodecSetHdrInfo(pOMXComponent);
 #endif
 
@@ -3405,7 +3407,9 @@ OMX_ERRORTYPE Exynos_H264Enc_SrcIn(
         if (pSrcInputData->dataLen == 0) {
             for (i = 0; i < nPlaneCnt; i++)
                 nDataLen[i] = 0;
-        } else {
+        } 
+#ifdef USE_EXTRA_INFO
+        else {
             /* when having valid input */
             if ((pH264Enc->hMFCH264Handle.bWeightedPrediction == OMX_TRUE) &&
                 (pSrcInputData->buffer.addr[2] != NULL)) {
@@ -3419,7 +3423,7 @@ OMX_ERRORTYPE Exynos_H264Enc_SrcIn(
                 }
             }
         }
-
+#endif
         if ((pH264Enc->hMFCH264Handle.videoInstInfo.supportInfo.enc.bDropControlSupport == VIDEO_TRUE) &&
             (pVideoEnc->bDropControl == OMX_TRUE)) {
             pEncOps->Set_DropControl(hMFCHandle, VIDEO_TRUE);

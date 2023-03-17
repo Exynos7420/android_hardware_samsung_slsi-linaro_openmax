@@ -34,7 +34,9 @@
 #include "Exynos_OSAL_Queue.h"
 #include "Exynos_OMX_Baseport.h"
 #include "Exynos_OMX_Basecomponent.h"
+#ifdef USE_HDR
 #include "VendorVideoAPI.h"
+#endif
 #include "ExynosVideoApi.h"
 
 #define MAX_VIDEO_INPUTBUFFER_NUM           5
@@ -184,8 +186,9 @@ typedef struct _EXYNOS_OMX_VIDEODEC_COMPONENT
     OMX_ERRORTYPE (*exynos_codec_reconfigAllBuffers) (OMX_COMPONENTTYPE *pOMXComponent, OMX_U32 nPortIndex);
     OMX_BOOL      (*exynos_codec_checkFormatSupport)(EXYNOS_OMX_BASECOMPONENT *pExynosComponent, OMX_COLOR_FORMATTYPE eColorFormat);
     OMX_ERRORTYPE (*exynos_codec_checkResolutionChange)(OMX_COMPONENTTYPE *pOMXComponent);
-
+#ifdef USE_EXTRA_INFO
     OMX_ERRORTYPE (*exynos_codec_updateExtraInfo)(OMX_COMPONENTTYPE *pOMXComponent, ExynosVideoMeta *pMeta);
+#endif
 } EXYNOS_OMX_VIDEODEC_COMPONENT;
 
 #ifdef __cplusplus

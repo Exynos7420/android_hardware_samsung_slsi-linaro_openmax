@@ -316,8 +316,8 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
     pCtx->videoCtx.hIONHandle = (unsigned long)hIonClient;
 
     if (pCtx->videoCtx.instInfo.supportInfo.enc.bTemporalSvcSupport == VIDEO_TRUE) {
-        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(TemporalLayerShareBuffer),
-                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc_fd(pCtx->videoCtx.hIONHandle, sizeof(TemporalLayerShareBuffer), 0,
+                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED, &(pCtx->videoCtx.specificInfo.enc.nTemporalLayerShareBufferFD));
         if (fd < 0) {
             ALOGE("%s: Failed to ion_alloc() for nTemporalLayerShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.enc.nTemporalLayerShareBufferFD = 0;
@@ -335,8 +335,8 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
     }
 
     if (pCtx->videoCtx.instInfo.supportInfo.enc.bRoiInfoSupport == VIDEO_TRUE) {
-        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(RoiInfoShareBuffer),
-                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc_fd(pCtx->videoCtx.hIONHandle, sizeof(RoiInfoShareBuffer), 0,
+                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED, &(pCtx->videoCtx.specificInfo.enc.pRoiShareBufferAddr));
         if (fd < 0) {
             ALOGE("%s: Failed to ion_alloc() for nRoiShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.enc.nRoiShareBufferFD = 0;
@@ -353,10 +353,11 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
         memset(pCtx->videoCtx.specificInfo.enc.pRoiShareBufferAddr, 0, sizeof(RoiInfoShareBuffer));
     }
 
+#ifdef USE_HDR
     /* for HDR Dynamic Info */
     if (pCtx->videoCtx.instInfo.supportInfo.enc.bHDRDynamicInfoSupport == VIDEO_TRUE) {
-        fd = ion_alloc(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM,
-                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED);
+        fd = ion_alloc_fd(pCtx->videoCtx.hIONHandle, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM, 0,
+                              ION_HEAP_SYSTEM_MASK, ION_FLAG_CACHED, &(pCtx->videoCtx.specificInfo.enc.nHDRInfoShareBufferFD));
         if (fd < 0) {
             ALOGE("%s: Failed to ion_alloc() for nHDRInfoShareBufferFD", __FUNCTION__);
             pCtx->videoCtx.specificInfo.enc.nHDRInfoShareBufferFD = 0;
@@ -382,6 +383,7 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
             ALOGE("[%s] Failed to Codec_OSAL_SetControl(CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE)", __FUNCTION__);
             goto EXIT_QUERYCAP_FAIL;
         }
+#endif
     }
 #endif
     return (void *)pCtx;

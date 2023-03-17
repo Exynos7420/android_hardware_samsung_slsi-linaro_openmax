@@ -51,6 +51,7 @@ LOCAL_SHARED_LIBRARIES := \
     libion_exynos \
     libcsc \
     libExynosOMX_Resourcemanager \
+    libion
 
 LOCAL_C_INCLUDES := \
 	$(EXYNOS_OMX_INC)/exynos \

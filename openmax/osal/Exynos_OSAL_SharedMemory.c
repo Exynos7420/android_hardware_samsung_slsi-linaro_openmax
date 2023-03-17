@@ -40,7 +40,7 @@
 #include <sys/mman.h>
 
 #include <ion/ion.h>
-#include "ION.h"
+#include "exynos_ion.h"
 
 #include "Exynos_OSAL_Mutex.h"
 #include "Exynos_OSAL_Memory.h"
@@ -187,26 +187,26 @@ OMX_PTR Exynos_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, MEMO
     case (EXT_MEMORY | SECURE_MEMORY | CONTIG_MEMORY):
     case (EXT_MEMORY | SECURE_MEMORY | CACHED_MEMORY):
     case (EXT_MEMORY | SECURE_MEMORY):
-        mask = ION_HEAP_VIDEO_STREAM_MASK;
+        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
         flag = ION_FLAG_PROTECTED;
         break;
     case (EXT_MEMORY | CONTIG_MEMORY | CACHED_MEMORY):
     case (EXT_MEMORY | CONTIG_MEMORY):
     case (EXT_MEMORY | CACHED_MEMORY):
     case EXT_MEMORY:
-        mask = ION_HEAP_VIDEO_STREAM_MASK;
+        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
         flag = 0;
         break;
     case (SECURE_MEMORY | CONTIG_MEMORY | CACHED_MEMORY):  /* SECURE */
     case (SECURE_MEMORY | CONTIG_MEMORY):
     case (SECURE_MEMORY | CACHED_MEMORY):
     case SECURE_MEMORY:
-        mask = ION_HEAP_VIDEO_STREAM_MASK;
+        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
         flag = ION_FLAG_PROTECTED;
         break;
     case (CONTIG_MEMORY | CACHED_MEMORY):  /* CONTIG */
     case CONTIG_MEMORY:
-        mask = ION_HEAP_VIDEO_STREAM_MASK;
+        mask = EXYNOS_ION_HEAP_VIDEO_STREAM_MASK;
         flag = 0;
         break;
     case CACHED_MEMORY:  /* CACHED */
@@ -223,12 +223,12 @@ OMX_PTR Exynos_OSAL_SharedMemory_Alloc(OMX_HANDLETYPE handle, OMX_U32 size, MEMO
     if (flag & ION_FLAG_CACHED)  /* use improved cache oprs */
         flag |= ION_FLAG_CACHED_NEEDS_SYNC;
 
-    if ((IONBuffer = ion_alloc(pHandle->hIONHandle, size, mask, flag)) < 0) {
+    if ((IONBuffer = ion_alloc_fd(pHandle->hIONHandle, size, 0, mask, flag, (int *)&IONBuffer)) < 0) {
         Exynos_OSAL_Log(EXYNOS_LOG_WARNING, "[%s] Failed to ion_alloc(mask:%x, flag:%x)", __FUNCTION__, mask, flag);
         if (memoryType == CONTIG_MEMORY) {
             /* retry at normal area */
             flag = 0;
-            if ((IONBuffer = ion_alloc(pHandle->hIONHandle, size, mask, flag)) < 0) {
+            if ((IONBuffer = ion_alloc_fd(pHandle->hIONHandle, size, 0, mask, flag, (int *)&IONBuffer)) < 0) {
                 Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%s] retry: Failed to ion_alloc(mask:%x, flag:%x)", __FUNCTION__, mask, flag);
                 IONBuffer = 0;
             }

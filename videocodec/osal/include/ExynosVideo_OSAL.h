@@ -38,7 +38,8 @@
 #include <linux/exynos_mfc_media.h>
 #endif
 
-#include "ion.h"
+#include <ion/ion.h>
+#include "exynos_ion.h"
 
 #include <log/log.h>
 

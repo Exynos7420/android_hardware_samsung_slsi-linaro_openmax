@@ -44,7 +44,9 @@
 
 #include "Exynos_OSAL_Platform.h"
 
+#ifdef USE_HDR
 #include "VendorVideoAPI.h"
+#endif
 
 /* To use CSC_METHOD_HW in EXYNOS OMX, gralloc should allocate physical memory using FIMC */
 /* It means GRALLOC_USAGE_HW_FIMC1 should be set on Native Window usage */
@@ -769,7 +771,7 @@ EXIT:
 
     return ret;
 }
-
+#ifdef USE_EXTRA_INFO
 OMX_ERRORTYPE Mpeg2CodecUpdateExtraInfo(
     OMX_COMPONENTTYPE   *pOMXComponent,
     ExynosVideoMeta     *pMeta)
@@ -810,7 +812,7 @@ OMX_ERRORTYPE Mpeg2CodecUpdateExtraInfo(
 EXIT:
     return ret;
 }
-
+#endif
 OMX_ERRORTYPE Mpeg2CodecUpdateBlackBarCrop(OMX_COMPONENTTYPE *pOMXComponent)
 {
     OMX_ERRORTYPE                  ret                  = OMX_ErrorNone;
@@ -2651,7 +2653,7 @@ OMX_ERRORTYPE Exynos_Mpeg2Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OM
             }
         }
     }
-
+#ifdef USE_EXTRA_INFO
     /* update extra information to vendor path for renderer
      * if BUFFER_COPY_FORCE is used, it will be updated at Exynos_CSC_OutputData()
      */
@@ -2659,7 +2661,7 @@ OMX_ERRORTYPE Exynos_Mpeg2Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OM
         (pVideoBuffer->planes[2].addr != NULL)) {
         Mpeg2CodecUpdateExtraInfo(pOMXComponent, pVideoBuffer->planes[2].addr);
     }
-
+#endif
     indexTimestamp = pDecOps->Get_FrameTag(hMFCHandle);
     Exynos_OSAL_Log(EXYNOS_LOG_ESSENTIAL, "[%p][%s] out indexTimestamp: %d", pExynosComponent, __FUNCTION__, indexTimestamp);
     if ((indexTimestamp < 0) || (indexTimestamp >= MAX_TIMESTAMP)) {
@@ -3174,9 +3176,9 @@ OSCL_EXPORT_REF OMX_ERRORTYPE Exynos_OMX_ComponentInit(
 
     pVideoDec->exynos_codec_checkFormatSupport      = &CheckFormatHWSupport;
     pVideoDec->exynos_codec_checkResolutionChange   = &Mpeg2CodecCheckResolution;
-
+#ifdef USE_EXTRA_INFO
     pVideoDec->exynos_codec_updateExtraInfo = &Mpeg2CodecUpdateExtraInfo;
-
+#endif
     pVideoDec->hSharedMemory = Exynos_OSAL_SharedMemory_Open();
     if (pVideoDec->hSharedMemory == NULL) {
         Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%p][%s] Failed to SharedMemory_Open", pExynosComponent, __FUNCTION__);

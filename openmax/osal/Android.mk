@@ -162,6 +162,7 @@ LOCAL_SHARED_LIBRARIES := \
     libion_exynos \
 
 LOCAL_C_INCLUDES := \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
 	$(EXYNOS_OMX_TOP)/core \
 	$(EXYNOS_OMX_INC)/exynos \
 	$(EXYNOS_OMX_TOP)/osal \
@@ -169,9 +170,13 @@ LOCAL_C_INCLUDES := \
 	$(EXYNOS_OMX_COMPONENT)/video/dec \
 	$(EXYNOS_OMX_COMPONENT)/video/enc \
 	$(EXYNOS_VIDEO_CODEC)/include \
-	$(TOP)/hardware/samsung_slsi/exynos/include \
-	$(TOP)/hardware/samsung_slsi/exynos/libion/include \
-	$(TOP)/system/core/libsystem/include/
+	$(TOP)/frameworks/native/libs/arect/include \
+	$(TOP)/hardware/samsung_slsi/$(TARGET_SOC)/include \
+	$(TOP)/hardware/samsung_slsi/$(TARGET_BOARD_PLATFORM)/include \
+	$(TOP)/hardware/samsung_slsi/exynos/include
+
+LOCAL_ADDITIONAL_DEPENDENCIES += \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 ifeq ($(BOARD_USE_ANDROID), true)
 LOCAL_SRC_FILES += \

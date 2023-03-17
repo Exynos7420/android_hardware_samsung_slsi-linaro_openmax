@@ -45,7 +45,9 @@
 
 #include "Exynos_OSAL_Platform.h"
 
+#ifdef USE_HDR
 #include "VendorVideoAPI.h"
+#endif
 
 /* To use CSC_METHOD_HW in EXYNOS OMX, gralloc should allocate physical memory using FIMC */
 /* It means GRALLOC_USAGE_HW_FIMC1 should be set on Native Window usage */
@@ -1276,7 +1278,7 @@ EXIT:
 
     return ret;
 }
-
+#ifdef USE_HDR
 void HEVCCodecSetHdrInfo(
     OMX_COMPONENTTYPE   *pOMXComponent,
     EXYNOS_OMX_DATA     *pSrcInputData)
@@ -1392,7 +1394,8 @@ void HEVCCodecSetHdrInfo(
 
     return ;
 }
-
+#endif
+#ifdef USE_HDR
 void HEVCCodecUpdateHdrDynamicInfo(
     OMX_COMPONENTTYPE   *pOMXComponent,
     EXYNOS_OMX_DATA     *pSrcInputData)
@@ -1469,7 +1472,7 @@ void HEVCCodecUpdateHdrDynamicInfo(
 
     return ;
 }
-
+#endif
 OMX_ERRORTYPE HevcCodecUpdateResolution(OMX_COMPONENTTYPE *pOMXComponent)
 {
     OMX_ERRORTYPE                  ret              = OMX_ErrorNone;
@@ -1631,7 +1634,7 @@ OMX_ERRORTYPE HEVCCodecSrcSetup(
          else
              Exynos_OSAL_Log(EXYNOS_LOG_WARNING, "[%p][%s] Not supported control: Enable_PrependSpsPpsToIdr", pExynosComponent, __FUNCTION__);
      }
-
+#ifdef USE_EXTRA_INFO
     if ((pInputPort->eMetaDataType == METADATA_TYPE_GRAPHIC) &&
         ((pInputPort->bufferProcessType & BUFFER_SHARE) &&
          (pSrcInputData->buffer.addr[2] != NULL))) {
@@ -1642,7 +1645,7 @@ OMX_ERRORTYPE HEVCCodecSrcSetup(
                 pMFCHevcHandle->bWeightedPrediction = OMX_TRUE;
         }
     }
-
+#endif
     if (pMFCHevcHandle->videoInstInfo.supportInfo.enc.bAdaptiveLayerBitrateSupport == VIDEO_TRUE) {
         if (pHevcEnc->bUseTemporalLayerBitrateRatio == OMX_TRUE) {
             pEncOps->Enable_AdaptiveLayerBitrate(pMFCHevcHandle->hMFCHandle, 0); /* Disable : Use layer bitrate from framework */
@@ -1651,7 +1654,7 @@ OMX_ERRORTYPE HEVCCodecSrcSetup(
         }
     }
 
-#ifdef USE_ANDROID
+#ifdef USE_HDR
     HEVCCodecSetHdrInfo(pOMXComponent, pSrcInputData);
 #endif
 
@@ -3398,7 +3401,9 @@ OMX_ERRORTYPE Exynos_HEVCEnc_SrcIn(
         if (pSrcInputData->dataLen == 0) {
             for (i = 0; i < nPlaneCnt; i++)
                 nDataLen[i] = 0;
-        } else {
+        }
+#ifdef USE_EXTRA_INFO 
+        else {
             /* when having valid input */
             if (pSrcInputData->buffer.addr[2] != NULL) {
                 ExynosVideoMeta *pVideoMeta = (ExynosVideoMeta *)pSrcInputData->buffer.addr[2];
@@ -3418,7 +3423,7 @@ OMX_ERRORTYPE Exynos_HEVCEnc_SrcIn(
             if (pHevcEnc->hMFCHevcHandle.bHDRDynamicInfo == OMX_TRUE)
                 HEVCCodecUpdateHdrDynamicInfo(pOMXComponent, pSrcInputData);
         }
-
+#endif
         if ((pHevcEnc->hMFCHevcHandle.videoInstInfo.supportInfo.enc.bDropControlSupport == VIDEO_TRUE) &&
             (pVideoEnc->bDropControl == OMX_TRUE)) {
             pEncOps->Set_DropControl(hMFCHandle, VIDEO_TRUE);

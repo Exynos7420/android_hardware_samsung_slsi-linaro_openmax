@@ -45,7 +45,9 @@
 
 #include "Exynos_OSAL_Platform.h"
 
+#ifdef USE_HDR
 #include "VendorVideoAPI.h"
+#endif
 
 /* To use CSC_METHOD_HW in EXYNOS OMX, gralloc should allocate physical memory using FIMC */
 /* It means GRALLOC_USAGE_HW_FIMC1 should be set on Native Window usage */
@@ -766,6 +768,7 @@ EXIT:
     return ret;
 }
 
+#ifdef USE_HDR
 void Vp9CodecUpdateHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 {
     EXYNOS_OMX_BASECOMPONENT      *pExynosComponent  = (EXYNOS_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
@@ -815,7 +818,8 @@ EXIT:
 
     return;
 }
-
+#endif
+#ifdef USE_EXTRA_INFO
 OMX_ERRORTYPE VP9CodecUpdateExtraInfo(
     OMX_COMPONENTTYPE   *pOMXComponent,
     ExynosVideoMeta     *pMeta)
@@ -874,7 +878,7 @@ OMX_ERRORTYPE VP9CodecUpdateExtraInfo(
 EXIT:
     return ret;
 }
-
+#endif
 OMX_ERRORTYPE Vp9CodecUpdateBlackBarCrop(OMX_COMPONENTTYPE *pOMXComponent)
 {
     OMX_ERRORTYPE                  ret                  = OMX_ErrorNone;
@@ -2773,10 +2777,11 @@ OMX_ERRORTYPE Exynos_VP9Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX_
 
     /* update extra info */
     {
+#ifdef USE_HDR
         /* color aspects : the bitstream has only this */
         if (pVideoBuffer->frameType & VIDEO_FRAME_WITH_HDR_INFO)
             Vp9CodecUpdateHdrInfo(pOMXComponent);
-
+#endif
         /* SBWC Normal format */
         if (pVideoBuffer->frameType & VIDEO_FRAME_NEED_ACTUAL_FORMAT) {
             nVideoFormat = pDecOps->Get_ActualFormat(hMFCHandle);
@@ -2796,7 +2801,7 @@ OMX_ERRORTYPE Exynos_VP9Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX_
             }
         }
     }
-
+#ifdef USE_EXTRA_INFO
     /* update extra information to vendor path for renderer
      * if BUFFER_COPY_FORCE is used, it will be updated at Exynos_CSC_OutputData()
      */
@@ -2804,7 +2809,7 @@ OMX_ERRORTYPE Exynos_VP9Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX_
         (pVideoBuffer->planes[2].addr != NULL)) {
         VP9CodecUpdateExtraInfo(pOMXComponent, pVideoBuffer->planes[2].addr);
     }
-
+#endif
     indexTimestamp = pDecOps->Get_FrameTag(hMFCHandle);
     Exynos_OSAL_Log(EXYNOS_LOG_ESSENTIAL, "[%p][%s] out indexTimestamp: %d", pExynosComponent, __FUNCTION__, indexTimestamp);
     if ((indexTimestamp < 0) || (indexTimestamp >= MAX_TIMESTAMP)) {
@@ -3327,9 +3332,9 @@ OSCL_EXPORT_REF OMX_ERRORTYPE Exynos_OMX_ComponentInit(
 
     pVideoDec->exynos_codec_checkFormatSupport      = &CheckFormatHWSupport;
     pVideoDec->exynos_codec_checkResolutionChange   = &Vp9CodecCheckResolution;
-
+#ifdef USE_EXTRA_INFO
     pVideoDec->exynos_codec_updateExtraInfo = &VP9CodecUpdateExtraInfo;
-
+#endif
     pVideoDec->hSharedMemory = Exynos_OSAL_SharedMemory_Open();
     if (pVideoDec->hSharedMemory == NULL) {
         Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%p][%s] Failed to SharedMemory_Open", pExynosComponent, __FUNCTION__);

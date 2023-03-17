@@ -541,6 +541,7 @@ int Codec_OSAL_GetControls(
             pFramePacking->frame1_grid_pos_y = OPERATE_BIT(seiGridPos, 0xf, 12);
         }
             break;
+#ifdef USE_HDR
         case CODEC_OSAL_CID_DEC_HDR_INFO:
         {
             ExynosVideoHdrInfo *pHdrInfo = (ExynosVideoHdrInfo *)pInfo;
@@ -695,6 +696,7 @@ int Codec_OSAL_GetControls(
             }
         }
             break;
+#endif
         default:
         {
             ALOGE("%s: unsupported type(%x)", __FUNCTION__, nCID);
@@ -985,7 +987,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 4;
                 }
-
+#ifdef V4L2_CID_MPEG_VIDEO_ROI_ENABLE
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bRoiInfoSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
                     ext_ctrl[i].id     = V4L2_CID_MPEG_VIDEO_ROI_ENABLE;
@@ -993,7 +995,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
-
+#endif
                 /* optional : if these are not set, set value are same as I frame */
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bQpRangePBSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
@@ -1008,7 +1010,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 4;
                 }
-
+#ifdef V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bPVCSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
                     ext_ctrl[i].id = V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE;
@@ -1016,6 +1018,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
+#endif
             }
                 break;
             case VIDEO_CODING_MPEG4:
@@ -1276,7 +1279,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 2;
                 }
-
+#ifdef V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bPVCSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
                     ext_ctrl[i].id = V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE;
@@ -1284,6 +1287,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
+#endif
             }
                 break;
             case VIDEO_CODING_HEVC:
@@ -1451,7 +1455,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
-
+#ifdef V4L2_CID_MPEG_VIDEO_ROI_ENABLE
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bRoiInfoSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
                     ext_ctrl[i].id     = V4L2_CID_MPEG_VIDEO_ROI_ENABLE;
@@ -1459,6 +1463,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
+#endif
 
                 /* optional : if these are not set, set value are same as I frame */
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bQpRangePBSupport == VIDEO_TRUE) {
@@ -1478,7 +1483,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 4;
                 }
-
+#ifdef V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bPVCSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
                     ext_ctrl[i].id = V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE;
@@ -1486,6 +1491,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
+#endif
             }
                 break;
             case VIDEO_CODING_VP9:
@@ -1597,7 +1603,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 2;
                 }
-
+#ifdef V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE
                 if (pCtx->videoCtx.instInfo.supportInfo.enc.bPVCSupport == VIDEO_TRUE) {
                     i = ext_ctrls.count;
                     ext_ctrl[i].id = V4L2_CID_MPEG_VIDEO_RC_PVC_ENABLE;
@@ -1605,6 +1611,7 @@ int Codec_OSAL_SetControls(
 
                     ext_ctrls.count += 1;
                 }
+#endif
             }
                 break;
             default:
@@ -1615,7 +1622,7 @@ int Codec_OSAL_SetControls(
             }
                 break;
             }
-
+#ifdef USE_EXTRA_INFO
             /* extra common parameters */
             if (pCtx->videoCtx.instInfo.supportInfo.enc.bDropControlSupport == VIDEO_TRUE) {
                 i = ext_ctrls.count;
@@ -1624,6 +1631,7 @@ int Codec_OSAL_SetControls(
 
                 ext_ctrls.count += 1;
             }
+#endif
 
             ext_ctrls.ctrl_class = V4L2_CTRL_CLASS_MPEG;
             ext_ctrls.controls = ext_ctrl;
@@ -1845,6 +1853,7 @@ int Codec_OSAL_SetControls(
             }
         }
             break;
+#ifdef USE_EXTRA_INFO
         case CODEC_OSAL_CID_ENC_COLOR_ASPECTS:
         {
             ExynosVideoColorAspects *pColorAspects = (ExynosVideoColorAspects *)pInfo;
@@ -1958,6 +1967,7 @@ int Codec_OSAL_SetControls(
             }
         }
             break;
+#endif
         default:
         {
             ALOGE("%s: unsupported CID(%x)", __FUNCTION__, nCID);
@@ -2071,7 +2081,6 @@ int Codec_OSAL_SetFormat(
         fmt.fmt.pix_mp.height                       = pFmt->height;
         fmt.fmt.pix_mp.plane_fmt[0].bytesperline    = pFmt->stride;
         fmt.fmt.pix_mp.num_planes                   = pFmt->nPlane;
-        fmt.fmt.pix_mp.flags                        = pFmt->field;
 
         for (i = 0; i < pFmt->nPlane; i++)
             fmt.fmt.pix_mp.plane_fmt[i].sizeimage = pFmt->planeSize[i];

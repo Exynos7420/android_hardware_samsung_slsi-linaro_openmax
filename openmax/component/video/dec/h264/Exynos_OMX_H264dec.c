@@ -42,8 +42,9 @@
 #include "Exynos_OSAL_Event.h"
 
 #include "Exynos_OSAL_Platform.h"
-
+#ifdef USE_HDR
 #include "VendorVideoAPI.h"
+#endif
 
 #ifdef USE_SKYPE_HD
 #include "Exynos_OSAL_SkypeHD.h"
@@ -882,7 +883,7 @@ EXIT:
     return ret;
 }
 #endif
-
+#ifdef USE_HDR
 void H264CodecUpdateHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 {
     EXYNOS_OMX_BASECOMPONENT      *pExynosComponent  = (EXYNOS_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
@@ -970,7 +971,8 @@ void H264CodecUpdateHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 EXIT:
     return;
 }
-
+#endif
+#ifdef USE_EXTRA_INFO
 OMX_ERRORTYPE H264CodecUpdateExtraInfo(
     OMX_COMPONENTTYPE   *pOMXComponent,
     ExynosVideoMeta     *pMeta)
@@ -1054,7 +1056,7 @@ OMX_ERRORTYPE H264CodecUpdateExtraInfo(
 EXIT:
     return ret;
 }
-
+#endif
 OMX_ERRORTYPE H264CodecUpdateBlackBarCrop(OMX_COMPONENTTYPE *pOMXComponent)
 {
     OMX_ERRORTYPE                  ret                  = OMX_ErrorNone;
@@ -3078,9 +3080,11 @@ OMX_ERRORTYPE Exynos_H264Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX
         /* interlace */
         pH264Dec->hMFCH264Handle.interlacedType = pVideoBuffer->interlacedType;
 
+#ifdef USE_HDR
         /* HDR */
         if (pVideoBuffer->frameType & VIDEO_FRAME_WITH_HDR_INFO)
             H264CodecUpdateHdrInfo(pOMXComponent);
+#endif
 
         /* SBWC Normal format */
         if (pVideoBuffer->frameType & VIDEO_FRAME_NEED_ACTUAL_FORMAT) {
@@ -3102,6 +3106,7 @@ OMX_ERRORTYPE Exynos_H264Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX
         }
     }
 
+#ifdef USE_EXTRA_INFO
     /* update extra information to vendor path for renderer
      * if BUFFER_COPY_FORCE is used, it will be updated at Exynos_CSC_OutputData()
      */
@@ -3109,7 +3114,7 @@ OMX_ERRORTYPE Exynos_H264Dec_DstOut(OMX_COMPONENTTYPE *pOMXComponent, EXYNOS_OMX
         (pVideoBuffer->planes[2].addr != NULL)) {
         H264CodecUpdateExtraInfo(pOMXComponent, pVideoBuffer->planes[2].addr);
     }
-
+#endif
     indexTimestamp = pDecOps->Get_FrameTag(hMFCHandle);
     Exynos_OSAL_Log(EXYNOS_LOG_ESSENTIAL, "[%p][%s] out indexTimestamp: %d", pExynosComponent, __FUNCTION__, indexTimestamp);
 
@@ -3655,9 +3660,9 @@ OSCL_EXPORT_REF OMX_ERRORTYPE Exynos_OMX_ComponentInit(OMX_HANDLETYPE hComponent
 
     pVideoDec->exynos_codec_checkFormatSupport      = &CheckFormatHWSupport;
     pVideoDec->exynos_codec_checkResolutionChange   = &H264CodecCheckResolution;
-
+#ifdef USE_EXTRA_INFO
     pVideoDec->exynos_codec_updateExtraInfo = &H264CodecUpdateExtraInfo;
-
+#endif
     pVideoDec->hSharedMemory = Exynos_OSAL_SharedMemory_Open();
     if (pVideoDec->hSharedMemory == NULL) {
         Exynos_OSAL_Log(EXYNOS_LOG_ERROR, "[%p][%s] Failed to SharedMemory_Open", pExynosComponent, __FUNCTION__);

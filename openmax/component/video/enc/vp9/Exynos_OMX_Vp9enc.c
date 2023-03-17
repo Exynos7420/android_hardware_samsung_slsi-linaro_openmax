@@ -1078,7 +1078,7 @@ EXIT:
 
     return ret;
 }
-
+#ifdef USE_HDR
 void VP9CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 {
     EXYNOS_OMX_BASECOMPONENT      *pExynosComponent = (EXYNOS_OMX_BASECOMPONENT *)pOMXComponent->pComponentPrivate;
@@ -1121,7 +1121,7 @@ void VP9CodecSetHdrInfo(OMX_COMPONENTTYPE *pOMXComponent)
 
     return ;
 }
-
+#endif
 OMX_ERRORTYPE Vp9CodecUpdateResolution(OMX_COMPONENTTYPE *pOMXComponent)
 {
     OMX_ERRORTYPE                  ret              = OMX_ErrorNone;
@@ -1276,7 +1276,7 @@ OMX_ERRORTYPE VP9CodecSrcSetup(
     }
     Print_VP9Enc_Param(pEncParam);
 
-#ifdef USE_ANDROID
+#ifdef USE_HDR
     VP9CodecSetHdrInfo(pOMXComponent);
 #endif
 
