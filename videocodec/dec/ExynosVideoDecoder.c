@@ -332,14 +332,14 @@ static void *MFC_Decoder_Init(ExynosVideoInstInfo *pVideoInfo)
 
         memset(pCtx->videoCtx.specificInfo.dec.pHDRInfoShareBufferAddr,
                 0, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM);
-
+#ifdef CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE
         if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE,
                                     pCtx->videoCtx.specificInfo.dec.nHDRInfoShareBufferFD) != 0) {
             ALOGE("[%s] Failed to Codec_OSAL_SetControl(CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE)", __FUNCTION__);
             goto EXIT_QUERYCAP_FAIL;
         }
     }
-
+#endif
     return (void *)pCtx;
 
 EXIT_QUERYCAP_FAIL:
@@ -964,10 +964,12 @@ static int MFC_Decoder_Get_ActualFormat(void *pHandle)
         goto EXIT;
     }
 
+#ifdef CODEC_OSAL_CID_DEC_ACTUAL_FORMAT
     if (Codec_OSAL_GetControl(pCtx, CODEC_OSAL_CID_DEC_ACTUAL_FORMAT, &nV4l2Format) != 0) {
         ALOGE("%s: Get extra format is failed", __FUNCTION__);
         goto EXIT;
     }
+#endif
 
     nVideoFormat = Codec_OSAL_PixelFormatToColorFormat((unsigned int)nV4l2Format);
 

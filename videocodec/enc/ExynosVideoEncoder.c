@@ -376,14 +376,14 @@ static void *MFC_Encoder_Init(ExynosVideoInstInfo *pVideoInfo)
 
         memset(pCtx->videoCtx.specificInfo.enc.pHDRInfoShareBufferAddr,
                 0, sizeof(ExynosVideoHdrDynamic) * VIDEO_BUFFER_MAX_NUM);
-
+#ifdef CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE
         if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE,
                                     pCtx->videoCtx.specificInfo.enc.nHDRInfoShareBufferFD) != 0) {
             ALOGE("[%s] Failed to Codec_OSAL_SetControl(CODEC_OSAL_CID_VIDEO_SET_HDR_USER_SHARED_HANDLE)", __FUNCTION__);
             goto EXIT_QUERYCAP_FAIL;
         }
     }
-
+#endif
     return (void *)pCtx;
 
 EXIT_QUERYCAP_FAIL:
@@ -1103,6 +1103,7 @@ static ExynosVideoErrorType MFC_Encoder_Set_RoiInfo(
         goto EXIT;
     }
 
+#ifdef CODEC_OSAL_CID_ENC_ROI_INFO
     memcpy(pRISB, pRoiInfo, sizeof(RoiInfoShareBuffer));
     if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_ENC_ROI_INFO,
                                 pCtx->videoCtx.specificInfo.enc.nRoiShareBufferFD) != 0) {
@@ -1110,6 +1111,7 @@ static ExynosVideoErrorType MFC_Encoder_Set_RoiInfo(
         ret = VIDEO_ERROR_APIFAIL;
         goto EXIT;
     }
+#endif
 
 EXIT:
     return ret;
@@ -1129,10 +1131,12 @@ static ExynosVideoErrorType MFC_Encoder_Enable_WeightedPrediction(void *pHandle)
         goto EXIT;
     }
 
+#ifdef CODEC_OSAL_CID_ENC_WP_ENABLE
     if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_ENC_WP_ENABLE, 1) != 0) {
         ret = VIDEO_ERROR_APIFAIL;
         goto EXIT;
     }
+#endif
 
 EXIT:
     return ret;
@@ -1159,11 +1163,13 @@ static ExynosVideoErrorType MFC_Encoder_Set_YSumData(
 
     nYSumData = (((unsigned long long)nHighData) << 32) | nLowData;  /* 64bit data */
 
+#ifdef CODEC_OSAL_CID_ENC_YSUM_DATA
     /* MFC D/D just want a LowData */
     if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_ENC_YSUM_DATA, (int)nLowData) != 0) {
         ret = VIDEO_ERROR_APIFAIL;
         goto EXIT;
     }
+#endif
 
 EXIT:
     return ret;
@@ -1188,10 +1194,12 @@ static ExynosVideoErrorType MFC_Encoder_Set_IFrameRatio(
     switch ((int)pCtx->videoCtx.instInfo.eCodecType) {
     case VIDEO_CODING_AVC:
     case VIDEO_CODING_HEVC:
+#ifdef CODEC_OSAL_CID_ENC_I_FRAME_RATIO
         if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_ENC_I_FRAME_RATIO, nRatio) != 0) {
             ret = VIDEO_ERROR_APIFAIL;
             goto EXIT;
         }
+#endif
 
         ret = VIDEO_ERROR_NONE;
         break;
@@ -1262,13 +1270,14 @@ static ExynosVideoErrorType MFC_Encoder_Enable_AdaptiveLayerBitrate(
     case VIDEO_CODING_HEVC:
     case VIDEO_CODING_VP8:
     case VIDEO_CODING_VP9:
+#ifdef CODEC_OSAL_CID_ENC_ENABLE_ADAPTIVE_LAYER_BITRATE
         if (pCtx->videoCtx.instInfo.supportInfo.enc.bAdaptiveLayerBitrateSupport == VIDEO_TRUE) {
             if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_ENC_ENABLE_ADAPTIVE_LAYER_BITRATE, bEnable) != 0) {
                 ret = VIDEO_ERROR_APIFAIL;
                 goto EXIT;
             }
         }
-
+#endif
         ret = VIDEO_ERROR_NONE;
         break;
     default:
@@ -1404,11 +1413,12 @@ ExynosVideoErrorType MFC_Encoder_Set_DropControl(
         ret = VIDEO_ERROR_NOSUPPORT;
         goto EXIT;
     }
-
+#ifdef CODEC_OSAL_CID_ENC_ENABLE_DROP_CTRL
     if (Codec_OSAL_SetControl(pCtx, CODEC_OSAL_CID_ENC_ENABLE_DROP_CTRL, (bEnable == VIDEO_TRUE)? 1:0) != 0) {
         ret = VIDEO_ERROR_APIFAIL;
         goto EXIT;
     }
+#endif
 
 EXIT:
     return ret;

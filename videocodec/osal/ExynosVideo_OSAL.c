@@ -123,39 +123,55 @@ ExynosVideoColorFormatType Codec_OSAL_PixelFormatToColorFormat(
     case V4L2_PIX_FMT_NV12M:
         eColorFormat = VIDEO_COLORFORMAT_NV12M;
         break;
+#ifdef V4L2_PIX_FMT_NV12N_10B
     case V4L2_PIX_FMT_NV12M_S10B:
         eColorFormat = VIDEO_COLORFORMAT_NV12M_S10B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV12M_P010
     case V4L2_PIX_FMT_NV12M_P010:
         eColorFormat = VIDEO_COLORFORMAT_NV12M_P010;
         break;
+#endif
     case V4L2_PIX_FMT_NV21M:
         eColorFormat = VIDEO_COLORFORMAT_NV21M;
         break;
+#ifdef V4L2_PIX_FMT_NV21M_S10B
     case V4L2_PIX_FMT_NV21M_S10B:
         eColorFormat = VIDEO_COLORFORMAT_NV21M_S10B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV21M_P010
     case V4L2_PIX_FMT_NV21M_P010:
         eColorFormat = VIDEO_COLORFORMAT_NV21M_P010;
         break;
+#endif
     case V4L2_PIX_FMT_YUV420M:
         eColorFormat = VIDEO_COLORFORMAT_I420M;
         break;
     case V4L2_PIX_FMT_YVU420M:
         eColorFormat = VIDEO_COLORFORMAT_YV12M;
         break;
+#ifdef V4L2_PIX_FMT_NV12M_SBWC_8B
     case V4L2_PIX_FMT_NV12M_SBWC_8B:
         eColorFormat = VIDEO_COLORFORMAT_NV12M_SBWC;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV12M_SBWC_10B
     case V4L2_PIX_FMT_NV12M_SBWC_10B:
         eColorFormat = VIDEO_COLORFORMAT_NV12M_10B_SBWC;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV21M_SBWC_8B
     case V4L2_PIX_FMT_NV21M_SBWC_8B:
         eColorFormat = VIDEO_COLORFORMAT_NV21M_SBWC;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV21M_SBWC_10B
     case V4L2_PIX_FMT_NV21M_SBWC_10B:
         eColorFormat = VIDEO_COLORFORMAT_NV21M_10B_SBWC;
         break;
+#endif
 #ifdef USE_SINGLE_PALNE_SUPPORT
     case V4L2_PIX_FMT_NV12N:
         eColorFormat = VIDEO_COLORFORMAT_NV12;
@@ -205,48 +221,68 @@ unsigned int Codec_OSAL_ColorFormatToPixelFormat(
     case VIDEO_COLORFORMAT_NV12M:
         nPixelFormat = V4L2_PIX_FMT_NV12M;
         break;
+#ifdef V4L2_PIX_FMT_NV12M_S10B
     case VIDEO_COLORFORMAT_NV12M_S10B:
         nPixelFormat = V4L2_PIX_FMT_NV12M_S10B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV12M_P010
     case VIDEO_COLORFORMAT_NV12M_P010:
         nPixelFormat = V4L2_PIX_FMT_NV12M_P010;
         break;
+#endif
     case VIDEO_COLORFORMAT_NV21M:
         nPixelFormat = V4L2_PIX_FMT_NV21M;
         break;
+#ifdef V4L2_PIX_FMT_NV21M_S10B
     case VIDEO_COLORFORMAT_NV21M_S10B:
         nPixelFormat = V4L2_PIX_FMT_NV21M_S10B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV21M_P010
     case VIDEO_COLORFORMAT_NV21M_P010:
         nPixelFormat = V4L2_PIX_FMT_NV21M_P010;
         break;
+#endif
     case VIDEO_COLORFORMAT_I420M:
         nPixelFormat = V4L2_PIX_FMT_YUV420M;
         break;
     case VIDEO_COLORFORMAT_YV12M:
         nPixelFormat = V4L2_PIX_FMT_YVU420M;
         break;
+#ifdef V4L2_PIX_FMT_NV12M_SBWC_8B
     case VIDEO_COLORFORMAT_NV12M_SBWC:
         nPixelFormat = V4L2_PIX_FMT_NV12M_SBWC_8B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV12M_SBWC_10B
     case VIDEO_COLORFORMAT_NV12M_10B_SBWC:
         nPixelFormat = V4L2_PIX_FMT_NV12M_SBWC_10B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV21M_SBWC_8B
     case VIDEO_COLORFORMAT_NV21M_SBWC:
         nPixelFormat = V4L2_PIX_FMT_NV21M_SBWC_8B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV21M_SBWC_10B
     case VIDEO_COLORFORMAT_NV21M_10B_SBWC:
         nPixelFormat = V4L2_PIX_FMT_NV21M_SBWC_10B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV12M_SBWCL_8B
     case VIDEO_COLORFORMAT_NV12M_SBWC_L50:
     case VIDEO_COLORFORMAT_NV12M_SBWC_L75:
         nPixelFormat = V4L2_PIX_FMT_NV12M_SBWCL_8B;
         break;
+#endif
+#ifdef V4L2_PIX_FMT_NV12M_SBWCL_10B
     case VIDEO_COLORFORMAT_NV12M_10B_SBWC_L40:
     case VIDEO_COLORFORMAT_NV12M_10B_SBWC_L60:
     case VIDEO_COLORFORMAT_NV12M_10B_SBWC_L80:
         nPixelFormat = V4L2_PIX_FMT_NV12M_SBWCL_10B;
         break;
+#endif
 #ifdef USE_SINGLE_PALNE_SUPPORT
     case VIDEO_COLORFORMAT_NV12:
         nPixelFormat = V4L2_PIX_FMT_NV12N;
