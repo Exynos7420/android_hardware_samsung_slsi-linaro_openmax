@@ -1,5 +1,4 @@
 ifeq ($(TARGET_SLSI_VARIANT),bsp)
-ifneq ($(filter exynos, $(TARGET_SOC_NAME)),)
 openmax_dirs := \
 	videocodec \
 	openmax
@@ -13,6 +12,5 @@ openmax_dirs := \
 	openmax
 
 include $(call all-named-subdir-makefiles,$(openmax_dirs))
-endif
 endif
 endif
